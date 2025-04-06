@@ -1,11 +1,14 @@
 import random
-import re
 from typing import Literal, Optional
+from typing_extensions import Annotated, TypeAlias
 
-from pydantic import BaseModel, Field, root_validator
-from pydantic.types import ConstrainedStr
+from pydantic import BaseModel, Field, StringConstraints, model_validator
 
-PREFIX_KEY = Literal["ctrl", "shift", "ctrl shift"]
+PREFIX_KEY = Literal[
+    "ctrl",
+    "shift",
+    "ctrl shift",
+]
 SUFFIX_KEY = Literal[
     "0",
     "1",
@@ -50,45 +53,60 @@ def generate_random_hex_color():
     return f"#{random.randint(0, 0xFFFFFF):06x}"
 
 
-class Text(ConstrainedStr):
-    min_length = 1
-    max_length = 100
-    strip_whitespace = True
+Text: TypeAlias = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=1,
+        max_length=100,
+    ),
+]
 
-
-class Color(ConstrainedStr):
-    regex = re.compile(r"#[a-fA-F0-9]{6}")
+Color: TypeAlias = Annotated[
+    str,
+    StringConstraints(
+        pattern=r"#[a-fA-F0-9]{6}",
+    ),
+]
 
 
 class LabelType(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     text: Text
     prefix_key: Optional[PREFIX_KEY] = None
     suffix_key: Optional[SUFFIX_KEY] = None
     background_color: Color = Field(default_factory=generate_random_hex_color)
     text_color: Color = Field(default="#ffffff")
 
-    @root_validator
-    def deny_only_prefix_key(cls, values):
-        prefix_key = values.get("prefix_key")
-        suffix_key = values.get("suffix_key")
+    @model_validator(mode="after")
+    def deny_only_prefix_key(self) -> "LabelType":
+        prefix_key = self.prefix_key
+        suffix_key = self.suffix_key
         if prefix_key and suffix_key is None:
-            raise ValueError("You must specify a suffix_key if you specify a prefix_key.")
-        return values
+            raise ValueError(
+                "You must specify a suffix_key if you specify a prefix_key."
+            )
+        return self
 
     @classmethod
     def create(
         cls,
         text: str,
-        prefix_key: PREFIX_KEY = None,
-        suffix_key: SUFFIX_KEY = None,
+        prefix_key: Optional[PREFIX_KEY] = None,
+        suffix_key: Optional[SUFFIX_KEY] = None,
         color: Optional[str] = None,
         id: Optional[int] = None,
     ):
         if color is None:
             return cls(id=id, text=text, prefix_key=prefix_key, suffix_key=suffix_key)
         else:
-            return cls(id=id, text=text, prefix_key=prefix_key, suffix_key=suffix_key, background_color=color)
+            return cls(
+                id=id,
+                text=text,
+                prefix_key=prefix_key,
+                suffix_key=suffix_key,
+                background_color=color,
+            )
 
 
 CategoryType = LabelType

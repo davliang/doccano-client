@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class Example(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     text: Optional[str] = None
     meta: Dict[str, Any] = Field(default_factory=dict)
     annotation_approver: Optional[str] = None

@@ -22,7 +22,7 @@ class ProjectRepository:
             Project: The converted project
         """
         response["tags"] = [tag["text"] for tag in response.get("tags", [])]
-        return Project.parse_obj(response)
+        return Project.model_validate(response)
 
     def _to_persistent(self, project: Project) -> Dict[str, Any]:
         """Convert a domain object to a persistent object
@@ -33,7 +33,7 @@ class ProjectRepository:
         Returns:
             Dict[str, Any]: The converted project
         """
-        project_dict = project.dict()
+        project_dict = project.model_dump()
         project_dict["tags"] = [{"text": tag} for tag in project_dict["tags"]]
         return project_dict
 

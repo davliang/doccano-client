@@ -21,7 +21,7 @@ class UserDetailsRepository:
             UserDetails: The user login info.
         """
         response = self._client.get("auth/user/")
-        return UserDetails.parse_obj(response.json())
+        return UserDetails.model_validate(response.json())
 
     def update_current_user_details(self, user_details: UserDetails) -> UserDetails:
         """Update either username, first name or last name of the current user.
@@ -33,10 +33,12 @@ class UserDetailsRepository:
         Returns:
             UserDetails: the updated user login info
         """
-        response = self._client.put("auth/user/", json=user_details.dict())
-        return UserDetails.parse_obj(response.json())
+        response = self._client.put("auth/user/", json=user_details.model_dump())
+        return UserDetails.model_validate(response.json())
 
-    def change_current_user_password(self, password_change: PasswordChange) -> PasswordUpdated:
+    def change_current_user_password(
+        self, password_change: PasswordChange
+    ) -> PasswordUpdated:
         """Change the password of the Current User
 
         Args:
@@ -47,6 +49,9 @@ class UserDetailsRepository:
         """
         response = self._client.post(
             "auth/password/change/",
-            json={"new_password1": password_change.new_password, "new_password2": password_change.confirm_password},
+            json={
+                "new_password1": password_change.new_password,
+                "new_password2": password_change.confirm_password,
+            },
         )
-        return PasswordUpdated.parse_obj(response.json())
+        return PasswordUpdated.model_validate(response.json())

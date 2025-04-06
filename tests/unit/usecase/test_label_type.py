@@ -20,7 +20,9 @@ class TestLabelTypeUseCase:
         cls.label_type_repository = MagicMock()
         cls.label_type_service = MagicMock()
         cls.label_type_service.exists.return_value = False
-        cls.label_type_usecase = LabelTypeUseCase(cls.label_type_repository, cls.label_type_service)
+        cls.label_type_usecase = LabelTypeUseCase(
+            cls.label_type_repository, cls.label_type_service
+        )
 
     def test_find_by_id(self):
         self.label_type_usecase.find_by_id(0, 1)
@@ -34,7 +36,9 @@ class TestLabelTypeUseCase:
         project_id = 0
         self.label_type_usecase.create(project_id, **payload)
         payload["background_color"] = payload.pop("color")
-        self.label_type_repository.create.assert_called_once_with(project_id, LabelType.parse_obj(payload))
+        self.label_type_repository.create.assert_called_once_with(
+            project_id, LabelType.model_validate(payload)
+        )
 
     def test_cannot_create_duplicate_label_type(self, payload):
         project_id = 0
@@ -48,7 +52,9 @@ class TestLabelTypeUseCase:
         self.label_type_repository.find_by_id.return_value = label_type
         self.label_type_usecase.update(project_id, label_type.id, text="New Label Type")
         label_type.text = "New Label Type"
-        self.label_type_repository.update.assert_called_once_with(project_id, label_type)
+        self.label_type_repository.update.assert_called_once_with(
+            project_id, label_type
+        )
 
     def test_cannot_update_duplicate_label_type(self, payload):
         project_id = 0

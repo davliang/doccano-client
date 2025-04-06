@@ -89,16 +89,16 @@ class ProjectUseCase:
     def update(
         self,
         project_id: int,
-        name: str = None,
-        project_type: ProjectType = None,
-        description: str = None,
-        guideline: str = None,
-        random_order: bool = None,
-        collaborative_annotation: bool = None,
-        single_class_classification: bool = None,
-        allow_overlapping: bool = None,
-        grapheme_mode: bool = None,
-        use_relation: bool = None,
+        name: Optional[str] = None,
+        project_type: Optional[ProjectType] = None,
+        description: Optional[str] = None,
+        guideline: Optional[str] = None,
+        random_order: Optional[bool] = None,
+        collaborative_annotation: Optional[bool] = None,
+        single_class_classification: Optional[bool] = None,
+        allow_overlapping: Optional[bool] = None,
+        grapheme_mode: Optional[bool] = None,
+        use_relation: Optional[bool] = None,
         tags: Optional[List[str]] = None,
     ) -> Project:
         """Update a project
@@ -127,16 +127,24 @@ class ProjectUseCase:
             description=description or project.description,
             guideline=guideline if guideline is not None else project.guideline,
             project_type=project_type or project.project_type,
-            random_order=random_order if random_order is not None else project.random_order,
+            random_order=random_order
+            if random_order is not None
+            else project.random_order,
             collaborative_annotation=collaborative_annotation
             if collaborative_annotation is not None
             else project.collaborative_annotation,
             single_class_classification=single_class_classification
             if single_class_classification is not None
             else project.single_class_classification,
-            allow_overlapping=allow_overlapping if allow_overlapping is not None else project.allow_overlapping,
-            grapheme_mode=grapheme_mode if grapheme_mode is not None else project.grapheme_mode,
-            use_relation=use_relation if use_relation is not None else project.use_relation,
+            allow_overlapping=allow_overlapping
+            if allow_overlapping is not None
+            else project.allow_overlapping,
+            grapheme_mode=grapheme_mode
+            if grapheme_mode is not None
+            else project.grapheme_mode,
+            use_relation=use_relation
+            if use_relation is not None
+            else project.use_relation,
             tags=tags or [],
         )
         return self._repository.update(project)

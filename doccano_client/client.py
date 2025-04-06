@@ -152,19 +152,27 @@ class DoccanoClient:
 
     @property
     def data_import(self) -> DataUploadUseCase:
-        return DataUploadUseCase(self._data_import_repository, self._task_status_repository)
+        return DataUploadUseCase(
+            self._data_import_repository, self._task_status_repository
+        )
 
     @property
     def data_export(self) -> DataDownloadUseCase:
-        return DataDownloadUseCase(self._data_export_repository, self._task_status_repository)
+        return DataDownloadUseCase(
+            self._data_export_repository, self._task_status_repository
+        )
 
     @property
     def member(self) -> MemberUseCase:
-        return MemberUseCase(self._member_repository, self._user_repository, self._role_repository)
+        return MemberUseCase(
+            self._member_repository, self._user_repository, self._role_repository
+        )
 
     @property
     def category(self) -> CategoryUseCase:
-        return CategoryUseCase(self._category_repository, self._category_type_repository)
+        return CategoryUseCase(
+            self._category_repository, self._category_type_repository
+        )
 
     @property
     def span(self) -> SpanUseCase:
@@ -172,7 +180,9 @@ class DoccanoClient:
 
     @property
     def relation(self) -> RelationUseCase:
-        return RelationUseCase(self._relation_repository, self._relation_type_repository)
+        return RelationUseCase(
+            self._relation_repository, self._relation_type_repository
+        )
 
     @property
     def segment(self) -> SegmentUseCase:
@@ -180,7 +190,9 @@ class DoccanoClient:
 
     @property
     def bounding_box(self) -> BoundingBoxUseCase:
-        return BoundingBoxUseCase(self._bounding_box_repository, self._category_type_repository)
+        return BoundingBoxUseCase(
+            self._bounding_box_repository, self._category_type_repository
+        )
 
     @property
     def text(self) -> TextUseCase:
@@ -190,7 +202,9 @@ class DoccanoClient:
     def user_details(self) -> UserDetailsUseCase:
         return UserDetailsUseCase(self._user_details_repository)
 
-    def _get_label_type_usecase(self, type: Literal["category", "span", "relation"]) -> LabelTypeUseCase:
+    def _get_label_type_usecase(
+        self, type: Literal["category", "span", "relation"]
+    ) -> LabelTypeUseCase:
         if type == "category":
             return self.category_type
         elif type == "span":
@@ -216,7 +230,9 @@ class DoccanoClient:
         """
         return self._user_repository.get_profile()
 
-    def change_current_user_password(self, password: str, confirm_password: str) -> PasswordUpdated:
+    def change_current_user_password(
+        self, password: str, confirm_password: str
+    ) -> PasswordUpdated:
         """Change the current user's password
 
         Args:
@@ -226,10 +242,15 @@ class DoccanoClient:
         Returns:
             PasswordUpdated: Message confirming password change.
         """
-        return self.user_details.change_current_user_password(password=password, confirm_password=confirm_password)
+        return self.user_details.change_current_user_password(
+            password=password, confirm_password=confirm_password
+        )
 
     def update_current_user_details(
-        self, username: str = None, first_name: str = None, last_name: str = None
+        self,
+        username: Optional[str] = None,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
     ) -> UserDetails:
         """Update either username, first name or last name of the current user.
            If any args are left as None the current info will be kept
@@ -243,7 +264,9 @@ class DoccanoClient:
             UserDetails: the updated user login info
         """
         return self.user_details.update_current_user_details(
-            username=username, first_name=first_name, last_name=last_name
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
         )
 
     def create_user(self, username: str, password: str) -> User:
@@ -397,16 +420,16 @@ class DoccanoClient:
     def update_project(
         self,
         project_id: int,
-        name: str = None,
-        project_type: ProjectType = None,
-        description: str = None,
-        guideline: str = None,
-        random_order: bool = None,
-        collaborative_annotation: bool = None,
-        single_class_classification: bool = None,
-        allow_overlapping: bool = None,
-        grapheme_mode: bool = None,
-        use_relation: bool = None,
+        name: Optional[str] = None,
+        project_type: Optional[ProjectType] = None,
+        description: Optional[str] = None,
+        guideline: Optional[str] = None,
+        random_order: Optional[bool] = None,
+        collaborative_annotation: Optional[bool] = None,
+        single_class_classification: Optional[bool] = None,
+        allow_overlapping: Optional[bool] = None,
+        grapheme_mode: Optional[bool] = None,
+        use_relation: Optional[bool] = None,
         tags: Optional[List[str]] = None,
     ) -> Project:
         """Update a project. `ProjectType` is one of the
@@ -454,7 +477,9 @@ class DoccanoClient:
         """
         self.project.delete(project_id)
 
-    def list_label_types(self, project_id: int, type: Literal["category", "span", "relation"]) -> List[LabelType]:
+    def list_label_types(
+        self, project_id: int, type: Literal["category", "span", "relation"]
+    ) -> List[LabelType]:
         """Return all label types in a project.
 
         Args:
@@ -467,7 +492,10 @@ class DoccanoClient:
         return self._get_label_type_usecase(type).list(project_id)
 
     def find_label_type_by_id(
-        self, project_id: int, label_type_id: int, type: Literal["category", "span", "relation"]
+        self,
+        project_id: int,
+        label_type_id: int,
+        type: Literal["category", "span", "relation"],
     ) -> LabelType:
         """Find a label type by id.
 
@@ -544,7 +572,12 @@ class DoccanoClient:
             color=color,
         )
 
-    def delete_label_type(self, project_id: int, label_type_id: int, type: Literal["category", "span", "relation"]):
+    def delete_label_type(
+        self,
+        project_id: int,
+        label_type_id: int,
+        type: Literal["category", "span", "relation"],
+    ):
         """Delete a label type.
 
         Args:
@@ -555,7 +588,10 @@ class DoccanoClient:
         self._get_label_type_usecase(type).delete(project_id, label_type_id)
 
     def bulk_delete_label_types(
-        self, project_id: int, label_type_ids: List[int], type: Literal["category", "span", "relation"]
+        self,
+        project_id: int,
+        label_type_ids: List[int],
+        type: Literal["category", "span", "relation"],
     ):
         """Delete multiple label types.
 
@@ -566,7 +602,12 @@ class DoccanoClient:
         """
         self._get_label_type_usecase(type).bulk_delete(project_id, label_type_ids)
 
-    def upload_label_type(self, project_id: int, file_path: str, type: Literal["category", "span", "relation"]):
+    def upload_label_type(
+        self,
+        project_id: int,
+        file_path: str,
+        type: Literal["category", "span", "relation"],
+    ):
         """Upload a label type.
 
         Args:
@@ -576,7 +617,9 @@ class DoccanoClient:
         """
         self._get_label_type_usecase(type).upload(project_id, file_path)
 
-    def list_examples(self, project_id: int, is_confirmed: Optional[bool] = None) -> Iterator[Example]:
+    def list_examples(
+        self, project_id: int, is_confirmed: Optional[bool] = None
+    ) -> Iterator[Example]:
         """Return all examples.
 
         Args:
@@ -611,7 +654,13 @@ class DoccanoClient:
         """
         return self.example.count(project_id)
 
-    def create_example(self, project_id: int, text: str, score: float = 100.0, meta: Dict[str, Any] = None) -> Example:
+    def create_example(
+        self,
+        project_id: int,
+        text: str,
+        score: float = 100.0,
+        meta: Dict[str, Any] = None,
+    ) -> Example:
         """Create a new example.
 
         Args:
@@ -626,7 +675,12 @@ class DoccanoClient:
         return self.example.create(project_id, text, score, meta)
 
     def update_example(
-        self, project_id: int, example_id: int, text: str = None, score: float = None, meta: Dict[str, Any] = None
+        self,
+        project_id: int,
+        example_id: int,
+        text: str = None,
+        score: float = None,
+        meta: Dict[str, Any] = None,
     ) -> Example:
         """Update an example.
 
@@ -689,7 +743,9 @@ class DoccanoClient:
         """
         return self.comment.find_by_id(project_id, comment_id)
 
-    def list_comments(self, project_id: int, example_id: int, query: str = "") -> Iterator[Comment]:
+    def list_comments(
+        self, project_id: int, example_id: int, query: str = ""
+    ) -> Iterator[Comment]:
         """Return all comments.
 
         Args:
@@ -793,9 +849,13 @@ class DoccanoClient:
         Returns:
             TaskStatus: The status of the upload task.
         """
-        return self.data_import.upload(project_id, file_paths, task, format, column_data, column_label)
+        return self.data_import.upload(
+            project_id, file_paths, task, format, column_data, column_label
+        )
 
-    def download(self, project_id: int, format: str, only_approved=False, dir_name=".") -> pathlib.Path:
+    def download(
+        self, project_id: int, format: str, only_approved=False, dir_name="."
+    ) -> pathlib.Path:
         """Download a file.
 
         Args:
@@ -886,7 +946,9 @@ class DoccanoClient:
         """
         self.member.bulk_delete(project_id, member_ids)
 
-    def find_category_by_id(self, project_id: int, example_id: int, label_id: int) -> Category:
+    def find_category_by_id(
+        self, project_id: int, example_id: int, label_id: int
+    ) -> Category:
         """Find a category by id.
 
         Args:
@@ -912,7 +974,9 @@ class DoccanoClient:
         """
         return self.span.find_by_id(project_id, example_id, label_id)
 
-    def find_relation_by_id(self, project_id: int, example_id: int, label_id: int) -> Relation:
+    def find_relation_by_id(
+        self, project_id: int, example_id: int, label_id: int
+    ) -> Relation:
         """Find a relation by id.
 
         Args:
@@ -938,7 +1002,9 @@ class DoccanoClient:
         """
         return self.text.find_by_id(project_id, example_id, label_id)
 
-    def find_segment_by_id(self, project_id: int, example_id: int, label_id: int) -> Segment:
+    def find_segment_by_id(
+        self, project_id: int, example_id: int, label_id: int
+    ) -> Segment:
         """Find a segment by id.
 
         Args:
@@ -951,7 +1017,9 @@ class DoccanoClient:
         """
         return self.segment.find_by_id(project_id, example_id, label_id)
 
-    def find_bounding_box_by_id(self, project_id: int, example_id: int, label_id: int) -> BoundingBox:
+    def find_bounding_box_by_id(
+        self, project_id: int, example_id: int, label_id: int
+    ) -> BoundingBox:
         """Find a bounding box by id.
 
         Args:
@@ -1024,7 +1092,9 @@ class DoccanoClient:
         """
         return self.segment.list(project_id, example_id)
 
-    def list_bounding_boxes(self, project_id: int, example_id: int) -> List[BoundingBox]:
+    def list_bounding_boxes(
+        self, project_id: int, example_id: int
+    ) -> List[BoundingBox]:
         """Return all bounding boxes.
 
         Args:
@@ -1151,7 +1221,12 @@ class DoccanoClient:
         self.bounding_box.delete_all(project_id, example_id)
 
     def create_category(
-        self, project_id: int, example_id: int, label: int | str, human_annotated=False, confidence=0.0
+        self,
+        project_id: int,
+        example_id: int,
+        label: int | str,
+        human_annotated=False,
+        confidence=0.0,
     ) -> Category:
         """Create a new category label.
 
@@ -1165,7 +1240,9 @@ class DoccanoClient:
         Returns:
             Category: The created category label.
         """
-        return self.category.create(project_id, example_id, label, human_annotated, confidence)
+        return self.category.create(
+            project_id, example_id, label, human_annotated, confidence
+        )
 
     def create_span(
         self,
@@ -1191,7 +1268,15 @@ class DoccanoClient:
         Returns:
             Span: The created span label.
         """
-        return self.span.create(project_id, example_id, start_offset, end_offset, label, human_annotated, confidence)
+        return self.span.create(
+            project_id,
+            example_id,
+            start_offset,
+            end_offset,
+            label,
+            human_annotated,
+            confidence,
+        )
 
     def create_relation(
         self,
@@ -1217,7 +1302,9 @@ class DoccanoClient:
         Returns:
             Relation: The created relation label.
         """
-        return self.relation.create(project_id, example_id, from_id, to_id, label, human_annotated, confidence)
+        return self.relation.create(
+            project_id, example_id, from_id, to_id, label, human_annotated, confidence
+        )
 
     def create_text(
         self,
@@ -1239,7 +1326,9 @@ class DoccanoClient:
         Returns:
             Text: The created text label.
         """
-        return self.text.create(project_id, example_id, text, human_annotated, confidence)
+        return self.text.create(
+            project_id, example_id, text, human_annotated, confidence
+        )
 
     def create_bounding_box(
         self,
@@ -1269,7 +1358,17 @@ class DoccanoClient:
         Returns:
             BoundingBox: The created bounding box label.
         """
-        return self.bounding_box.create(project_id, example_id, x, y, width, height, label, human_annotated, confidence)
+        return self.bounding_box.create(
+            project_id,
+            example_id,
+            x,
+            y,
+            width,
+            height,
+            label,
+            human_annotated,
+            confidence,
+        )
 
     def create_segment(
         self,
@@ -1293,7 +1392,9 @@ class DoccanoClient:
         Returns:
             Segment: The created segment label.
         """
-        return self.segment.create(project_id, example_id, points, label, human_annotated, confidence)
+        return self.segment.create(
+            project_id, example_id, points, label, human_annotated, confidence
+        )
 
     def update_category(
         self,
@@ -1317,7 +1418,9 @@ class DoccanoClient:
         Returns:
             Category: The updated category label.
         """
-        return self.category.update(project_id, example_id, label_id, label, human_annotated, confidence)
+        return self.category.update(
+            project_id, example_id, label_id, label, human_annotated, confidence
+        )
 
     def update_span(
         self,
@@ -1346,7 +1449,14 @@ class DoccanoClient:
             Span: The updated span label.
         """
         return self.span.update(
-            project_id, example_id, label_id, start_offset, end_offset, label, human_annotated, confidence
+            project_id,
+            example_id,
+            label_id,
+            start_offset,
+            end_offset,
+            label,
+            human_annotated,
+            confidence,
         )
 
     def update_relation(
@@ -1376,7 +1486,14 @@ class DoccanoClient:
             Relation: The updated relation label.
         """
         return self.relation.update(
-            project_id, example_id, label_id, from_id, to_id, label, human_annotated, confidence
+            project_id,
+            example_id,
+            label_id,
+            from_id,
+            to_id,
+            label,
+            human_annotated,
+            confidence,
         )
 
     def update_text(
@@ -1401,7 +1518,9 @@ class DoccanoClient:
         Returns:
             Text: The updated text label.
         """
-        return self.text.update(project_id, example_id, label_id, text, human_annotated, confidence)
+        return self.text.update(
+            project_id, example_id, label_id, text, human_annotated, confidence
+        )
 
     def update_bounding_box(
         self,
@@ -1434,7 +1553,16 @@ class DoccanoClient:
             BoundingBox: The updated bounding box label.
         """
         return self.bounding_box.update(
-            project_id, example_id, label_id, x, y, width, height, label, human_annotated, confidence
+            project_id,
+            example_id,
+            label_id,
+            x,
+            y,
+            width,
+            height,
+            label,
+            human_annotated,
+            confidence,
         )
 
     def update_segment(
@@ -1461,4 +1589,6 @@ class DoccanoClient:
         Returns:
             Segment: The updated segment label.
         """
-        return self.segment.update(project_id, example_id, label_id, points, label, human_annotated, confidence)
+        return self.segment.update(
+            project_id, example_id, label_id, points, label, human_annotated, confidence
+        )

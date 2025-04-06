@@ -30,7 +30,9 @@ class TestExampleUseCase:
     def test_create(self, payload):
         project_id = 0
         self.usecase.create(project_id, **payload)
-        self.repository.create.assert_called_once_with(project_id, Example.parse_obj(payload))
+        self.repository.create.assert_called_once_with(
+            project_id, Example.model_validate(payload)
+        )
 
     def test_update(self, payload):
         project_id = 0

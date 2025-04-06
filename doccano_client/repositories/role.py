@@ -19,7 +19,7 @@ class RoleRepository:
             Role: The list of the roles.
         """
         response = self._client.get("roles")
-        roles = [Role.parse_obj(role) for role in response.json()]
+        roles = [Role.model_validate(role) for role in response.json()]
         return roles
 
     def find_by_name(self, name: str) -> Role:

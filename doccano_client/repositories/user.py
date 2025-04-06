@@ -19,7 +19,7 @@ class UserRepository:
             User: The user.
         """
         response = self._client.get("me")
-        return User.parse_obj(response.json())
+        return User.model_validate(response.json())
 
     def list(self, name: str = "") -> List[User]:
         """Return users
@@ -31,7 +31,7 @@ class UserRepository:
             User: The list of the users.
         """
         response = self._client.get(f"users?q={name}")
-        users = [User.parse_obj(user) for user in response.json()]
+        users = [User.model_validate(user) for user in response.json()]
         return users
 
     def find_by_name(self, name: str) -> User:
@@ -66,4 +66,4 @@ class UserRepository:
             "users/create",
             json={"username": username, "password1": password, "password2": password},
         )
-        return User.parse_obj(response.json())
+        return User.model_validate(response.json())

@@ -1,3 +1,4 @@
+from typing import Optional
 from doccano_client.models.user_details import (
     PasswordChange,
     PasswordUpdated,
@@ -19,7 +20,10 @@ class UserDetailsUseCase:
         return self._user_details_repository.get_current_user_details()
 
     def update_current_user_details(
-        self, username: str = None, first_name: str = None, last_name: str = None
+        self,
+        username: Optional[str] = None,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
     ) -> UserDetails:
         """Update either username, first name or last name of the current user.
            If any args are left as None the current info will be kept
@@ -42,7 +46,9 @@ class UserDetailsUseCase:
         )
         return self._user_details_repository.update_current_user_details(user_details)
 
-    def change_current_user_password(self, password: str, confirm_password: str) -> PasswordUpdated:
+    def change_current_user_password(
+        self, password: str, confirm_password: str
+    ) -> PasswordUpdated:
         """Change the password of the current user
 
         Args:
@@ -52,5 +58,9 @@ class UserDetailsUseCase:
         Returns:
             PasswordUpdated: Message confirming password change.
         """
-        password_change = PasswordChange(new_password=password, confirm_password=confirm_password)
-        return self._user_details_repository.change_current_user_password(password_change)
+        password_change = PasswordChange(
+            new_password=password, confirm_password=confirm_password
+        )
+        return self._user_details_repository.change_current_user_password(
+            password_change
+        )

@@ -3,19 +3,19 @@ from typing import List, Optional
 from pydantic import (
     BaseModel,
     Field,
+    field_validator,
+    model_validator,
     NonNegativeFloat,
     NonNegativeInt,
-    root_validator,
-    validator,
 )
 
 
 class Label(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     example: int
     prob: float = 0.0
     manual: bool = False
-    user: Optional[int]
+    user: Optional[int] = None
 
 
 class Category(Label):
@@ -27,12 +27,13 @@ class Span(Label):
     start_offset: NonNegativeInt
     end_offset: NonNegativeInt
 
-    @root_validator
-    def check_start_offset_is_less_than_end_offset(cls, values):
-        start_offset, end_offset = values.get("start_offset"), values.get("end_offset")
+    @model_validator(mode="after")
+    def check_start_offset_is_less_than_end_offset(self) -> "Span":
+        start_offset = self.start_offset
+        end_offset = self.end_offset
         if start_offset >= end_offset:
             raise ValueError("start_offset must be less than end_offset.")
-        return values
+        return self
 
     def to_tuple(self) -> tuple:
         return self.start_offset, self.end_offset, self.label
@@ -56,8 +57,11 @@ class Segment(Label):
     points: List[NonNegativeFloat] = Field(default_factory=list)
     label: int
 
-    @validator("points")
-    def check_points_length_is_even(cls, points):
+    @field_validator("points")
+    @classmethod
+    def check_points_length_is_even(
+        cls, points: List[NonNegativeFloat]
+    ) -> List[NonNegativeFloat]:
         if len(points) % 2 != 0:
             raise ValueError("The length of points must be even.")
         return points

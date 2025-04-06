@@ -22,7 +22,7 @@ class TaskStatusRepository:
             TaskStatus: The task_status.
         """
         response = self._client.get(f"tasks/status/{task_id}")
-        return TaskStatus.parse_obj(response.json())
+        return TaskStatus.model_validate(response.json())
 
     def wait(self, task_id: str, timeout: int = 3600) -> TaskStatus:
         """Wait for the specified task id

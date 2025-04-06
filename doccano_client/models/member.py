@@ -6,7 +6,7 @@ ROLE_NAME = Literal["project_admin", "annotator", "annotation_approver"]
 
 
 class Member(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     user: int
     role: int
     username: str = ""

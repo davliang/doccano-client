@@ -32,7 +32,9 @@ class TestCommentUseCase:
         example_id = 1
         self.usecase.create(project_id, example_id, **payload)
         payload["example"] = example_id
-        self.repository.create.assert_called_once_with(project_id, Comment.parse_obj(payload))
+        self.repository.create.assert_called_once_with(
+            project_id, Comment.model_validate(payload)
+        )
 
     def test_update(self):
         project_id = 0

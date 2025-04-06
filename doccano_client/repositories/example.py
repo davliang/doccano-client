@@ -23,7 +23,7 @@ class ExampleRepository:
             Example: The found example
         """
         response = self._client.get(f"projects/{project_id}/examples/{example_id}")
-        return Example.parse_obj(response.json())
+        return Example.model_validate(response.json())
 
     def count(self, project_id: int) -> int:
         """Count the number of examples
@@ -37,7 +37,9 @@ class ExampleRepository:
         response = self._client.get(f"projects/{project_id}/examples")
         return response.json()["count"]
 
-    def list(self, project_id: int, is_confirmed: Optional[bool] = None) -> Iterator[Example]:
+    def list(
+        self, project_id: int, is_confirmed: Optional[bool] = None
+    ) -> Iterator[Example]:
         """Return all examples in which you are a member
 
         Args:
@@ -55,7 +57,7 @@ class ExampleRepository:
         while True:
             examples = response.json()
             for example in examples["results"]:
-                yield Example.parse_obj(example)
+                yield Example.model_validate(example)
 
             if examples["next"] is None:
                 break
@@ -72,8 +74,10 @@ class ExampleRepository:
         Returns:
             Example: The created example
         """
-        response = self._client.post(f"projects/{project_id}/examples", json=example.dict(exclude={"id"}))
-        return Example.parse_obj(response.json())
+        response = self._client.post(
+            f"projects/{project_id}/examples", json=example.model_dump(exclude={"id"})
+        )
+        return Example.model_validate(response.json())
 
     def update(self, project_id: int, example: Example) -> Example:
         """Update a example
@@ -86,8 +90,8 @@ class ExampleRepository:
             Example: The updated example
         """
         resource = f"projects/{project_id}/examples/{example.id}"
-        response = self._client.put(resource, json=example.dict())
-        return Example.parse_obj(response.json())
+        response = self._client.put(resource, json=example.model_dump())
+        return Example.model_validate(response.json())
 
     def delete(self, project_id: int, example: Example | int):
         """Delete a example
@@ -115,7 +119,9 @@ class ExampleRepository:
             project_id (int): The id of the project
             examples (List[int] | List[Example]): The list of example ids to delete
         """
-        ids = [example if isinstance(example, int) else example.id for example in examples]
+        ids = [
+            example if isinstance(example, int) else example.id for example in examples
+        ]
         self._client.delete(f"projects/{project_id}/examples", json={"ids": ids})
 
     def update_state(self, project_id: int, example: Example | int):

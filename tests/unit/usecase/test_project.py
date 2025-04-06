@@ -34,10 +34,12 @@ class TestProjectUseCase:
     def test_create(self, payload):
         payload.pop("id")
         self.project_usecase.create(**payload)
-        self.project_repository.create.assert_called_once_with(Project.parse_obj(payload))
+        self.project_repository.create.assert_called_once_with(
+            Project.model_validate(payload)
+        )
 
     def test_update(self, payload):
-        project = Project.parse_obj(payload)
+        project = Project.model_validate(payload)
         self.project_repository.find_by_id.return_value = project
         self.project_usecase.update(project_id=1, name="New Name")
         project.name = "New Name"

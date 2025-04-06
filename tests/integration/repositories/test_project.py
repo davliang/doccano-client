@@ -28,7 +28,7 @@ class TestProjectRepository:
         client = MagicMock()
         client.post.return_value.json.return_value = response
         project_client = ProjectRepository(client)
-        project = project_client.create(Project.parse_obj(response))
+        project = project_client.create(Project.model_validate(response))
         assert project.id == 1
 
     def test_update(self, response):
@@ -36,7 +36,7 @@ class TestProjectRepository:
         client.put.return_value.json.return_value = response.copy()
         project_client = ProjectRepository(client)
         response["name"] = "Updated Project"
-        project = Project.parse_obj(response)
+        project = Project.model_validate(response)
         project = project_client.update(project)
         assert project.id == 1
         assert project.name == "Test Project"

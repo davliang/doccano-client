@@ -24,7 +24,7 @@ class MemberRepository:
         """
         resource = f"projects/{project_id}/members/{member_id}"
         response = self._client.get(resource)
-        return Member.parse_obj(response.json())
+        return Member.model_validate(response.json())
 
     def list(self, project_id: int) -> List[Member]:
         """Return all member in which you are a member
@@ -37,7 +37,7 @@ class MemberRepository:
         """
         resource = f"projects/{project_id}/members"
         response = self._client.get(resource)
-        members = [Member.parse_obj(member) for member in response.json()]
+        members = [Member.model_validate(member) for member in response.json()]
         return members
 
     def create(self, project_id: int, member: Member) -> Member:
@@ -51,8 +51,10 @@ class MemberRepository:
             Member: The created member
         """
         resource = f"projects/{project_id}/members"
-        response = self._client.post(resource, json=member.dict(exclude={"id", "username", "rolename"}))
-        return Member.parse_obj(response.json())
+        response = self._client.post(
+            resource, json=member.model_dump(exclude={"id", "username", "rolename"})
+        )
+        return Member.model_validate(response.json())
 
     def update(self, project_id: int, member: Member) -> Member:
         """Update a member
@@ -70,8 +72,10 @@ class MemberRepository:
         if member.id is None:
             raise ValueError("Member id is required")
         resource = f"projects/{project_id}/members/{member.id}"
-        response = self._client.put(resource, json=member.dict(exclude={"username", "rolename"}))
-        return Member.parse_obj(response.json())
+        response = self._client.put(
+            resource, json=member.model_dump(exclude={"username", "rolename"})
+        )
+        return Member.model_validate(response.json())
 
     def delete(self, project_id: int, member: Member | int):
         """Delete a member

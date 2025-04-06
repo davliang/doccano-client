@@ -24,10 +24,14 @@ class CommentRepository:
         Returns:
             Comment: The found comment
         """
-        response = self._client.get(f"projects/{project_id}/{self.resource_type}/{comment_id}")
-        return Comment.parse_obj(response.json())
+        response = self._client.get(
+            f"projects/{project_id}/{self.resource_type}/{comment_id}"
+        )
+        return Comment.model_validate(response.json())
 
-    def list(self, project_id: int, example_id: Optional[int] = None, query: str = "") -> Iterator[Comment]:
+    def list(
+        self, project_id: int, example_id: Optional[int] = None, query: str = ""
+    ) -> Iterator[Comment]:
         """Return all comments in which you are a member
 
         Args:
@@ -42,11 +46,13 @@ class CommentRepository:
         if not example_id:
             params.pop("example")
 
-        response = self._client.get(f"projects/{project_id}/{self.resource_type}", params=params)
+        response = self._client.get(
+            f"projects/{project_id}/{self.resource_type}", params=params
+        )
         while True:
             comments = response.json()
             for comment in comments["results"]:
-                yield Comment.parse_obj(comment)
+                yield Comment.model_validate(comment)
 
             if comments["next"] is None:
                 break
@@ -63,9 +69,13 @@ class CommentRepository:
         Returns:
             Comment: The created comment
         """
-        resource = f"projects/{project_id}/{self.resource_type}?example={comment.example}"
-        response = self._client.post(resource, json=comment.dict(exclude={"id", "example"}))
-        return Comment.parse_obj(response.json())
+        resource = (
+            f"projects/{project_id}/{self.resource_type}?example={comment.example}"
+        )
+        response = self._client.post(
+            resource, json=comment.model_dump(exclude={"id", "example"})
+        )
+        return Comment.model_validate(response.json())
 
     def update(self, project_id: int, comment: Comment) -> Comment:
         """Update a comment
@@ -78,8 +88,8 @@ class CommentRepository:
             Comment: The updated comment
         """
         resource = f"projects/{project_id}/{self.resource_type}/{comment.id}"
-        response = self._client.put(resource, json=comment.dict())
-        return Comment.parse_obj(response.json())
+        response = self._client.put(resource, json=comment.model_dump())
+        return Comment.model_validate(response.json())
 
     def delete(self, project_id: int, comment: Comment | int):
         """Delete a comment
@@ -99,5 +109,9 @@ class CommentRepository:
             project_id (int): The id of the project
             comments (List[int] | List[Comment]): The list of comment ids to delete
         """
-        ids = [comment if isinstance(comment, int) else comment.id for comment in comments]
-        self._client.delete(f"projects/{project_id}/{self.resource_type}", json={"ids": ids})
+        ids = [
+            comment if isinstance(comment, int) else comment.id for comment in comments
+        ]
+        self._client.delete(
+            f"projects/{project_id}/{self.resource_type}", json={"ids": ids}
+        )

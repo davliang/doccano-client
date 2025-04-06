@@ -1,10 +1,23 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import AbstractSet, Any, Dict, List, Mapping, Optional, Union
+from typing import (
+    AbstractSet,
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Union,
+)
+from typing_extensions import Annotated, TypeAlias
 
-from pydantic import BaseModel
-from pydantic.types import ConstrainedStr
+from pydantic import (
+    BaseModel,
+    StringConstraints,
+    computed_field,
+    field_serializer,
+)
 
 IntStr = Union[int, str]
 AbstractSetIntStr = AbstractSet[IntStr]
@@ -24,19 +37,27 @@ class ProjectType(str, Enum):
     INTENT_DETECTION_AND_SLOT_FILLING = "IntentDetectionAndSlotFilling"
 
 
-class Name(ConstrainedStr):
-    min_length = 1
-    max_length = 100
-    strip_whitespace = True
+Name: TypeAlias = Annotated[
+    str,
+    StringConstraints(
+        min_length=1,
+        max_length=100,
+        strip_whitespace=True,
+    ),
+]
 
 
-class Description(ConstrainedStr):
-    min_length = 1
-    strip_whitespace = True
+Description: TypeAlias = Annotated[
+    str,
+    StringConstraints(
+        min_length=1,
+        strip_whitespace=True,
+    ),
+]
 
 
 class Project(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     name: Name
     description: Description
     guideline: str = "Please write annotation guideline."
@@ -49,31 +70,8 @@ class Project(BaseModel):
     use_relation: bool = False
     tags: List[str] = []
 
-    def dict(
-        self,
-        *,
-        include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
-        exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
-        by_alias: bool = False,
-        skip_defaults: bool = None,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
-        exclude_none: bool = False,
-    ) -> "DictStrAny":
-        attrs = super().dict(
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-        )
-        attrs["resourcetype"] = self.resource_type
-        attrs["project_type"] = self.project_type.value
-        return attrs
-
     @property
+    @computed_field
     def resource_type(self) -> str:
         PROJECT_TO_RESOURCE_TYPE = {
             ProjectType.DOCUMENT_CLASSIFICATION: "TextClassificationProject",
@@ -86,4 +84,10 @@ class Project(BaseModel):
             ProjectType.IMAGE_CAPTIONING: "ImageCaptioningProject",
             ProjectType.INTENT_DETECTION_AND_SLOT_FILLING: "IntentDetectionAndSlotFillingProject",
         }
+        if self.project_type not in PROJECT_TO_RESOURCE_TYPE:
+            raise ValueError(f"Unknown project_type: {self.project_type}")
         return PROJECT_TO_RESOURCE_TYPE[self.project_type]
+
+    @field_serializer("project_type")
+    def serialize_project_type(self, pt: ProjectType, _info):
+        return pt.value

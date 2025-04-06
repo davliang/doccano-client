@@ -26,7 +26,7 @@ class DataUploadRepository:
         """
         resource = f"projects/{project_id}/catalog"
         response = self._client.get(resource)
-        options = [Option.parse_obj(label) for label in response.json()]
+        options = [Option.model_validate(label) for label in response.json()]
         return options
 
     def upload(self, file_path: str) -> str:
@@ -56,7 +56,9 @@ class DataUploadRepository:
         headers = {"Content-Type": "text/plain", "Accept": "*/*"}
         self._client.delete(resource, data=upload_id, headers=headers)
 
-    def ingest(self, project_id: int, upload_ids: List[str], task: Task, format: str, **kwargs) -> str:
+    def ingest(
+        self, project_id: int, upload_ids: List[str], task: Task, format: str, **kwargs
+    ) -> str:
         """Ingest the uploaded files into the project
 
         Args:
